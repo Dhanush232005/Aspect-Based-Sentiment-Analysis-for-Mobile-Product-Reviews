@@ -5,10 +5,10 @@ import matplotlib.pyplot as plt
 # Sentiment Analyzer
 analyzer = SentimentIntensityAnalyzer()
 
-# Title
+# App Title
 st.title("📱 Aspect Based Sentiment Analysis")
 
-# User Input
+# Review Input
 review = st.text_area("Enter Mobile Review")
 
 # Aspect List
@@ -28,9 +28,10 @@ aspects = [
 # Analyze Button
 if st.button("Analyze"):
 
-    # Find Aspects
+    # Empty list for detected aspects
     found = []
 
+    # Aspect Detection
     for aspect in aspects:
         if aspect in review.lower():
             found.append(aspect)
@@ -49,7 +50,7 @@ if st.button("Analyze"):
     else:
         sentiment = "Neutral 😐"
 
-    # Results
+    # Display Results
     st.subheader("Results")
 
     st.write("### Aspects Found:")
@@ -58,9 +59,10 @@ if st.button("Analyze"):
     st.write("### Sentiment:")
     st.write(sentiment)
 
-    # Pie Chart Data
+    # Pie Chart Labels
     labels = ["Positive", "Negative", "Neutral"]
 
+    # Pie Chart Values
     if sentiment == "Positive 😊":
         values = [1, 0, 0]
 
@@ -81,5 +83,5 @@ if st.button("Analyze"):
 
     ax.set_title("Sentiment Distribution")
 
-    # Show Chart
+    # Show Pie Chart
     st.pyplot(fig)
