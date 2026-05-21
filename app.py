@@ -1,5 +1,9 @@
 import streamlit as st
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+import streamlit as st
+import plotly.express as px
+import pandas as pd
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 analyzer = SentimentIntensityAnalyzer()
 
