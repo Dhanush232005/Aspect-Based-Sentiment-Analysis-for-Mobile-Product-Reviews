@@ -51,3 +51,25 @@ if st.button("Analyze"):
 
     for aspect, sentiment in results.items():
         st.write(f"{aspect.title()} → {sentiment}")
+        import plotly.express as px
+import pandas as pd
+
+sentiment_values = list(results.values())
+
+positive = sentiment_values.count("Positive 😊")
+negative = sentiment_values.count("Negative 😔")
+neutral = sentiment_values.count("Neutral 😐")
+
+data = pd.DataFrame({
+    "Sentiment": ["Positive", "Negative", "Neutral"],
+    "Count": [positive, negative, neutral]
+})
+
+fig = px.pie(
+    data,
+    names="Sentiment",
+    values="Count",
+    title="Sentiment Distribution"
+)
+
+st.plotly_chart(fig)
