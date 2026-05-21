@@ -1,17 +1,15 @@
 import streamlit as st
+import re
+import pandas as pd
+import plotly.express as px
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-import matplotlib.pyplot as plt
 
-# Initialize Analyzer
 analyzer = SentimentIntensityAnalyzer()
 
-# App Title
-st.title("📱 Aspect Based Sentiment Analysis")
+st.title("Aspect Based Sentiment Analysis")
 
-# User Input
-review = st.text_area("Enter Mobile Review")
+review = st.text_area("Enter Review")
 
-# Aspect List
 aspects = [
     "battery",
     "camera",
@@ -25,74 +23,64 @@ aspects = [
     "speaker"
 ]
 
-# Analyze Button
 if st.button("Analyze"):
+
+    sentences = re.split("but|and", review)
 
     results = {}
 
-    # Aspect-wise Sentiment
-    for aspect in aspects:
+    for sentence in sentences:
 
-        if aspect in review.lower():
+        sentence = sentence.strip()
 
-            score = analyzer.polarity_scores(review)
+        score = analyzer.polarity_scores(sentence)
 
-            compound = score['compound']
+        compound = score['compound']
 
-            if compound >= 0.05:
-                sentiment = "Positive"
+        if compound >= 0.05:
+            sentiment = "Positive"
 
-            elif compound <= -0.05:
-                sentiment = "Negative"
+        elif compound <= -0.05:
+            sentiment = "Negative"
 
-            else:
-                sentiment = "Neutral"
+        else:
+            sentiment = "Neutral"
 
-            results[aspect] = sentiment
+        for aspect in aspects:
 
-    # Show Results
+            if aspect in sentence.lower():
+
+                results[aspect] = sentiment
+
     st.subheader("Aspect Wise Sentiment")
 
-    if results:
+    for aspect, sentiment in results.items():
 
-        for aspect, sentiment in results.items():
+        if sentiment == "Positive":
+            st.write(f"✅ {aspect.title()} : {sentiment}")
 
-            st.write(f"✅ {aspect.capitalize()} : {sentiment}")
+        elif sentiment == "Negative":
+            st.write(f"❌ {aspect.title()} : {sentiment}")
 
-    else:
+        else:
+            st.write(f"⚪ {aspect.title()} : {sentiment}")
 
-        st.write("No aspects found.")
+    sentiment_values = list(results.values())
 
-    # Count Sentiments
-    positive = list(results.values()).count("Positive")
-    negative = list(results.values()).count("Negative")
-    neutral = list(results.values()).count("Neutral")
+    positive = sentiment_values.count("Positive")
+    negative = sentiment_values.count("Negative")
+    neutral = sentiment_values.count("Neutral")
 
-    # Pie Chart
-    labels = []
-    values = []
+    data = pd.DataFrame({
+        "Sentiment": ["Positive", "Negative", "Neutral"],
+        "Count": [positive, negative, neutral]
+    })
 
-    if positive > 0:
-        labels.append("Positive")
-        values.append(positive)
-
-    if negative > 0:
-        labels.append("Negative")
-        values.append(negative)
-
-    if neutral > 0:
-        labels.append("Neutral")
-        values.append(neutral)
-
-    # Plot Pie Chart
-    fig, ax = plt.subplots(figsize=(5, 5))
-
-    ax.pie(
-        values,
-        labels=labels,
-        autopct='%1.1f%%'
+    fig = px.pie(
+        data,
+        names="Sentiment",
+        values="Count",
+        title="Sentiment Distribution"
     )
 
-    ax.set_title("Sentiment Distribution")
-
-    st.pyplot(fig)
+    st.plotly_chart(fig)
