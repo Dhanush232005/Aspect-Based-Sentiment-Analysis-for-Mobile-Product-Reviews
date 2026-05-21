@@ -2,13 +2,13 @@ import streamlit as st
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import matplotlib.pyplot as plt
 
-# Sentiment Analyzer
+# Initialize Analyzer
 analyzer = SentimentIntensityAnalyzer()
 
 # App Title
 st.title("📱 Aspect Based Sentiment Analysis")
 
-# Review Input
+# User Input
 review = st.text_area("Enter Mobile Review")
 
 # Aspect List
@@ -28,52 +28,64 @@ aspects = [
 # Analyze Button
 if st.button("Analyze"):
 
-    # Empty list for detected aspects
-    found = []
+    results = {}
 
-    # Aspect Detection
+    # Aspect-wise Sentiment
     for aspect in aspects:
+
         if aspect in review.lower():
-            found.append(aspect)
 
-    # Sentiment Analysis
-    score = analyzer.polarity_scores(review)
+            score = analyzer.polarity_scores(review)
 
-    compound = score['compound']
+            compound = score['compound']
 
-    if compound >= 0.05:
-        sentiment = "Positive 😊"
+            if compound >= 0.05:
+                sentiment = "Positive"
 
-    elif compound <= -0.05:
-        sentiment = "Negative 😔"
+            elif compound <= -0.05:
+                sentiment = "Negative"
 
-    else:
-        sentiment = "Neutral 😐"
+            else:
+                sentiment = "Neutral"
 
-    # Display Results
-    st.subheader("Results")
+            results[aspect] = sentiment
 
-    st.write("### Aspects Found:")
-    st.write(found)
+    # Show Results
+    st.subheader("Aspect Wise Sentiment")
 
-    st.write("### Sentiment:")
-    st.write(sentiment)
+    if results:
 
-    # Pie Chart Labels
-    labels = ["Positive", "Negative", "Neutral"]
+        for aspect, sentiment in results.items():
 
-    # Pie Chart Values
-    if sentiment == "Positive 😊":
-        values = [1, 0, 0]
-
-    elif sentiment == "Negative 😔":
-        values = [0, 1, 0]
+            st.write(f"✅ {aspect.capitalize()} : {sentiment}")
 
     else:
-        values = [0, 0, 1]
 
-    # Create Pie Chart
-    fig, ax = plt.subplots()
+        st.write("No aspects found.")
+
+    # Count Sentiments
+    positive = list(results.values()).count("Positive")
+    negative = list(results.values()).count("Negative")
+    neutral = list(results.values()).count("Neutral")
+
+    # Pie Chart
+    labels = []
+    values = []
+
+    if positive > 0:
+        labels.append("Positive")
+        values.append(positive)
+
+    if negative > 0:
+        labels.append("Negative")
+        values.append(negative)
+
+    if neutral > 0:
+        labels.append("Neutral")
+        values.append(neutral)
+
+    # Plot Pie Chart
+    fig, ax = plt.subplots(figsize=(5, 5))
 
     ax.pie(
         values,
@@ -83,5 +95,4 @@ if st.button("Analyze"):
 
     ax.set_title("Sentiment Distribution")
 
-    # Show Pie Chart
     st.pyplot(fig)
