@@ -5,7 +5,7 @@ analyzer = SentimentIntensityAnalyzer()
 
 st.title("Aspect Based Sentiment Analysis")
 
-review = st.text_input("Enter Review")
+review = st.text_area("Enter Review")
 
 aspects = [
     "battery",
@@ -21,25 +21,33 @@ aspects = [
 ]
 
 if st.button("Analyze"):
-    
-    found = []
 
-    for aspect in aspects:
-        if aspect in review.lower():
-            found.append(aspect)
+    sentences = review.split("but")
 
-    score = analyzer.polarity_scores(review)
+    results = {}
 
-    compound = score['compound']
+    for sentence in sentences:
 
-    if compound >= 0.05:
-        sentiment = "Positive"
+        for aspect in aspects:
 
-    elif compound <= -0.05:
-        sentiment = "Negative"
+            if aspect in sentence.lower():
 
-    else:
-        sentiment = "Neutral"
+                score = analyzer.polarity_scores(sentence)
 
-    st.write("### Aspects Found:", found)
-    st.write("### Sentiment:", sentiment)
+                compound = score['compound']
+
+                if compound >= 0.05:
+                    sentiment = "Positive 😊"
+
+                elif compound <= -0.05:
+                    sentiment = "Negative 😔"
+
+                else:
+                    sentiment = "Neutral 😐"
+
+                results[aspect] = sentiment
+
+    st.subheader("Aspect Wise Sentiment")
+
+    for aspect, sentiment in results.items():
+        st.write(f"{aspect.title()} → {sentiment}")
