@@ -1,5 +1,3 @@
 streamlit
 vaderSentiment
-plotly
-pandas
-mathplotlib
+matplotlib
